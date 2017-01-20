@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
 public class ServeurTCP extends Thread {
 	static final int PORT = 6666;
 	static final String END_OF_MESSAGE = "END_OF_MESSAGE";
@@ -17,12 +16,13 @@ public class ServeurTCP extends Thread {
 		try {
 
 			ServerSocket serverSocket = new ServerSocket(PORT);
-
+			int nbClients = 0;
 			while (true) {
-				
+
 				System.out.println("Serveur Prêt");
 				Socket socket = serverSocket.accept();
-				System.out.println("Client Connecté");
+				nbClients++;
+				System.out.println("Client " + nbClients + " Connecté");
 				InputStream stream = socket.getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 				String line = "";
@@ -30,14 +30,14 @@ public class ServeurTCP extends Thread {
 				while ((line = reader.readLine()).compareTo(END_OF_MESSAGE) != 0) {
 					System.out.println("MSG " + ++i + " : " + line);
 				}
-				
+
 				PrintWriter writer = new PrintWriter(socket.getOutputStream());
 				writer.println("Bye !");
 				writer.flush();
-				
-				try{
+
+				try {
 					Thread.sleep(2000);
-				}catch(InterruptedException e){
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				socket.close();

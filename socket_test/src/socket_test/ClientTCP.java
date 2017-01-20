@@ -9,13 +9,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-
 public class ClientTCP {
 	Socket socket;
 	private String host = "localhost";
 	private int port = ServeurTCP.PORT;
+	public String name;
 
-	public ClientTCP() {
+	public ClientTCP(String name) {
+		this.name = name;
 		try {
 			socket = new Socket(host, port);
 			PrintWriter writer = new PrintWriter(socket.getOutputStream());
@@ -41,7 +42,8 @@ public class ClientTCP {
 	}
 
 	public static void main(String[] args) {
-		new ClientTCP();
+		new ClientTCP("Client 1");
+		new ClientTCP("Client 2");
 	}
 
 }
