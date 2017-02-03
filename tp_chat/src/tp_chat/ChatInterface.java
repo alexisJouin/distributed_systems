@@ -27,7 +27,7 @@ public class ChatInterface {
     private JTextArea msgs;
     private JTextArea listCo;
     private JTextField msgToSend;
-    private JLabel titreMsg;
+    private JLabel nomClient;
     private String msgSend;
 
     /**
@@ -55,7 +55,7 @@ public class ChatInterface {
         listCo = new JTextArea("Liste des personnes connectés :");
         msgToSend = new JTextField("Entrez votre message ! ");
         sendButton = new JButton("Envoyer");
-        titreMsg = new JLabel("Liste des Messages :");
+        nomClient = new JLabel("Toto");
 
         /**
          * Style des composants
@@ -96,6 +96,7 @@ public class ChatInterface {
         northPanel.add(msgs, BorderLayout.CENTER);
         northPanel.add(listCo, BorderLayout.EAST);
         // Sud
+        southPanel.add(nomClient, BorderLayout.WEST);
         southPanel.add(msgToSend, BorderLayout.CENTER);
         southPanel.add(sendButton, BorderLayout.EAST);
         // Fen�tre globale
@@ -117,5 +118,16 @@ public class ChatInterface {
     public String getMsgToSend() {
         return this.msgSend;
     }
+    public JTextArea getMsgs(){
+        return this.msgs;
+    }
+    
+    public JTextArea getListCo(){
+        return this.listCo;
+    }
+    public JLabel getNomClient(){
+        return this.nomClient;
+    }
+        
 
 }

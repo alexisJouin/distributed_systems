@@ -7,16 +7,24 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.JLabel;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.text.SimpleAttributeSet;
 
-public class ChatClient{
+public class ChatClient {
 
     Socket socket;
     private String host = "localhost";
     private int port = ChatServeur.PORT;
     private String name;
     private ChatInterface chat;
+    private JLabel nomClient;
+    private JTextArea listCo;
 
     public ChatClient() {
 
@@ -26,6 +34,11 @@ public class ChatClient{
 
         // Saisie du nom
         this.name = JOptionPane.showInputDialog("Saisir votre Pseudo : ");
+        //Affichage sur l'interface
+        nomClient = chat.getNomClient();
+        nomClient.setText(this.name + ": ");
+
+        System.out.println("Bienvenue Client " + this.name);
 
         try {
             socket = new Socket(host, port);
@@ -33,16 +46,38 @@ public class ChatClient{
             writer.println(this.name);
             writer.flush();
 
-            
             //Get serveur message
             InputStream is;
             is = socket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
+
+//            String nomsCo = br.readLine();
+//            listCo.append(nomsCo);
             String message = "";
             while ((message = br.readLine()) != null) {
-                System.out.println("Message du serveur : " + message);
-                
+                //Si c'est un message
+                if (message.contains("msg:")) {
+                    List<String> arrayMsg = new ArrayList<String>(Arrays.asList(message.split(",")));
+                    String msg = arrayMsg.get(0).replace("msg:[", "");
+                    String client = arrayMsg.get(1).replace("]", "");
+                    System.out.println("Message du serveur : " + msg);
+                    JTextArea listMsgs = chat.getMsgs();
+                    //Affichage dans la fenêtre
+                    listMsgs.append("\n " + client + " > " + msg);
+                    //Si c'est pour un nouveu client
+                } else if (message.contains("listCo:")) {
+                    List<String> arrayClientsCo = new ArrayList<String>(Arrays.asList(message.split(",")));
+
+                    listCo = chat.getListCo();
+                    listCo.setText("Liste des personnes connectés :");
+                    for (String clientsCo : arrayClientsCo) {
+                        listCo.append("\n" + clientsCo.replace("listCo:[", "").replace("]", ""));
+                        System.out.println("list co : " + clientsCo);
+                    }
+
+                }
+
             }
 
         } catch (IOException e) {

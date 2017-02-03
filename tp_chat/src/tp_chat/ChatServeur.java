@@ -32,9 +32,7 @@ public class ChatServeur implements Runnable {
                 new ChatThread(socket).start();
                 this.nbClients = this.addClient(socket);
                 
-                System.out.println("Socket Client  : " + socket);
                 System.out.println("Nombre de clients co : " + this.getNbClients());
-                System.out.println("List clients : " + this.getListClient());
 
             }
         } catch (IOException ex) {
