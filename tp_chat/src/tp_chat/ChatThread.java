@@ -8,60 +8,65 @@ import java.net.Socket;
 
 public class ChatThread extends Thread implements Runnable {
 
-	private Thread thread;
-	private Socket socket;
-	private PrintWriter sortie;
-	private BufferedReader entree;
-	private ChatServeur serveur;
-	private int numClient = 0;
+    private Socket socket;
+    private PrintWriter sortie;
+    private BufferedReader entree;
+    private int numClient = 0;
+    private String clientName;
 
-	ChatThread(Socket s, ChatServeur serveur) {
+    public ChatThread(Socket s) {
 
-		this.serveur = serveur;
-		this.socket = s;
+        this.socket = s;
+        try {
 
-		try {
+            this.sortie = new PrintWriter(this.socket.getOutputStream());
+            this.entree = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            //this.numClient = serveur.addClient(this.sortie);
 
-			this.sortie = new PrintWriter(this.socket.getOutputStream());
-			this.entree = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			this.numClient = serveur.addClient(this.sortie);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		thread = new Thread(this);
-		thread.start();
-	}
+    }
 
-	public void run() {
-		String message = "";
-		System.out.println("Un nouveau client s'est connecte, no " + this.numClient);
-		try {
+    //ENVOIE A TOUT LE MONDE
+    public void sendToAll(String message, String clientName) throws IOException {
+        for (Socket s : ChatServeur.tabClients) {
+            PrintWriter out = new PrintWriter(s.getOutputStream());
+            out.println(message);
+            out.flush();
+        }
+    }
 
-			char charCur[] = new char[1];
-			while (this.entree.read(charCur, 0, 1) != -1) {
-				if (charCur[0] != '\u0000' && charCur[0] != '\n' && charCur[0] != '\r')
-					message += charCur[0];
-				else if (!message.equalsIgnoreCase("")) {
-					if (charCur[0] == '\u0000')
-						this.serveur.sendToAll(message, "" + charCur[0]);
-					else
-						this.serveur.sendToAll(message, "");
-					message = "";
-				}
-			}
-		} catch (Exception e) {
-		} finally // ?D�co du client
-		{
-			try {
-				System.out.println("Le client no " + this.numClient + " s'est deconnecte");
-				this.serveur.delClient(this.numClient); 
-				this.socket.close(); 
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public void run() {
+        String message = "";
+        this.numClient = ChatServeur.tabClients.size();
+        System.out.println("Un nouveau client s'est connecte, n° " + this.numClient++);
+        try {
+
+            String line = "";
+            int i = 0;
+            this.clientName = entree.readLine();
+            System.out.println("Nom du client : " + this.clientName);
+
+            while ((line = entree.readLine()) != null) {
+                this.sendToAll(line, clientName);
+                System.out.println("MSG de " + this.clientName + " n° " + ++i + " : " + line);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally { //Déconnection du client ??
+            try {
+                System.out.println("Le client n° " + this.numClient + " s'est deconnecte");
+                ChatServeur.tabClients.remove(this.socket);
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
 
 }

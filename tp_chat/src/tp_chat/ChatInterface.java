@@ -5,13 +5,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Scanner;
-
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -20,108 +16,106 @@ import ActionListener.FieldListener;
 import ActionListener.FieldMouseListener;
 
 public class ChatInterface {
-	private ChatClient client;
-	private JFrame frame;
 
-	private JPanel mainPanel;
-	private JPanel northPanel;
-	private JPanel southPanel;
-	private JButton sendButton;
-	private JTextArea msgs;
-	private JTextArea listCo;
-	private JTextField msgToSend;
-	private JLabel titreMsg;
-	private String msgSend;
+    private ChatClient client;
+    private JFrame frame;
 
-	/**
-	 * Constructeur par défaut - Intteraction CLIENT / SERVEUR
-	 */
-	public ChatInterface(ChatClient c) {
-		this.client = c;
-	}
+    private JPanel mainPanel;
+    private JPanel northPanel;
+    private JPanel southPanel;
+    private JButton sendButton;
+    private JTextArea msgs;
+    private JTextArea listCo;
+    private JTextField msgToSend;
+    private JLabel titreMsg;
+    private String msgSend;
 
-	/**
-	 * Gestion de l'interface Création de l'interface
-	 */
-	public void run() {
+    /**
+     * Constructeur par dï¿½faut - Intteraction CLIENT / SERVEUR
+     */
+    public ChatInterface(ChatClient c) {
+        this.client = c;
+    }
 
-		frame = new JFrame("Super Chat 2000");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				
-		// Panels
-		mainPanel = new JPanel(new BorderLayout());
-		northPanel = new JPanel(new BorderLayout());
-		southPanel = new JPanel(new BorderLayout());
+    /**
+     * Gestion de l'interface Crï¿½ation de l'interface
+     */
+    public void run() {
 
-		// Elements des panels
-		msgs = new JTextArea("Liste des messages :");
-		listCo = new JTextArea("Liste des personnes connectés :");
-		msgToSend = new JTextField("Entrez votre message ! ");
-		sendButton = new JButton("Envoyer");
-		titreMsg = new JLabel("Liste des Messages :");
+        frame = new JFrame("Super Chat 2000");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		/**
-		 * Style des composants
-		 */
-		Font font = new Font("Arial", Font.PLAIN, 20);
-		msgs.setFont(font);
-		msgs.setEditable(false); 
+        // Panels
+        mainPanel = new JPanel(new BorderLayout());
+        northPanel = new JPanel(new BorderLayout());
+        southPanel = new JPanel(new BorderLayout());
 
-		msgToSend.setFont(font);
-		msgToSend.setBackground(Color.lightGray);
-		msgToSend.setForeground(Color.BLACK);
+        // Elements des panels
+        msgs = new JTextArea("Liste des messages :");
+        listCo = new JTextArea("Liste des personnes connectÃ©s :");
+        msgToSend = new JTextField("Entrez votre message ! ");
+        sendButton = new JButton("Envoyer");
+        titreMsg = new JLabel("Liste des Messages :");
 
-		listCo.setFont(font);
-		listCo.setBackground(Color.darkGray);
-		listCo.setForeground(Color.WHITE);
-		listCo.setEditable(false); 
+        /**
+         * Style des composants
+         */
+        Font font = new Font("Arial", Font.PLAIN, 20);
+        msgs.setFont(font);
+        msgs.setEditable(false);
 
-		sendButton.setFont(font);
+        msgToSend.setFont(font);
+        msgToSend.setBackground(Color.lightGray);
+        msgToSend.setForeground(Color.BLACK);
 
-		// ActionListener
-		msgToSend.addActionListener(new FieldListener(msgToSend));
-		msgToSend.addMouseListener(new FieldMouseListener(msgToSend));
+        listCo.setFont(font);
+        listCo.setBackground(Color.darkGray);
+        listCo.setForeground(Color.WHITE);
+        listCo.setEditable(false);
 
-		// Si text n'est pas vide on enregistre le message et on envoie au client
-		if (msgToSend.getText() != "") {
-			sendButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setMsgToSend(msgToSend.getText());
-					msgToSend.setText("");
-					client.sendMessage(msgToSend.getText());
-				}
-			});
-		}
+        sendButton.setFont(font);
 
-		
-		// Assemblage des éléments
-		// Nord
-		northPanel.add(msgs, BorderLayout.CENTER);
-		northPanel.add(listCo, BorderLayout.EAST);
-		// Sud
-		southPanel.add(msgToSend, BorderLayout.CENTER);
-		southPanel.add(sendButton, BorderLayout.EAST);
-		// Fenêtre globale
-		mainPanel.add(northPanel, BorderLayout.CENTER);
-		mainPanel.add(southPanel, BorderLayout.SOUTH);
+        // ActionListener
+        msgToSend.addActionListener(new FieldListener(msgToSend));
+        msgToSend.addMouseListener(new FieldMouseListener(msgToSend));
 
-		frame.getContentPane().add(mainPanel);
-		frame.setSize(640, 480);
-		frame.setVisible(true);
-		
-		
+        // Si text n'est pas vide on enregistre le message et on envoie au client
+        if (msgToSend.getText() != "") {
+            sendButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setMsgToSend(msgToSend.getText());
+                    msgToSend.setText("");
+                    //client.sendMessage(msgToSend.getText());
+                }
+            });
+        }
 
-	}
+        // Assemblage des ï¿½lï¿½ments
+        // Nord
+        northPanel.add(msgs, BorderLayout.CENTER);
+        northPanel.add(listCo, BorderLayout.EAST);
+        // Sud
+        southPanel.add(msgToSend, BorderLayout.CENTER);
+        southPanel.add(sendButton, BorderLayout.EAST);
+        // Fenï¿½tre globale
+        mainPanel.add(northPanel, BorderLayout.CENTER);
+        mainPanel.add(southPanel, BorderLayout.SOUTH);
 
-	public void setMsgToSend(String msg) {
-		this.msgSend = msg;
-		System.out.println("Msg depuis ChatMain : " + msg);
+        frame.getContentPane().add(mainPanel);
+        frame.setSize(640, 480);
+        frame.setVisible(true);
 
-	}
+    }
 
-	public String getMsgToSend() {
-		return this.msgSend;
-	}
+    public void setMsgToSend(String msg) {
+        this.msgSend = msg;
+        System.out.println("Msg depuis l'interface : " + msg);
+        client.sendMessage(msg); //Envoie pour serveur
+    }
+
+    public String getMsgToSend() {
+        return this.msgSend;
+    }
 
 }

@@ -9,102 +9,75 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
 
-public class ChatServeur {
-	static final int PORT = 6666;
-	private int nbClients = 0;
-	private Vector<PrintWriter> tabClients = new Vector<PrintWriter>();
-	private PrintWriter sortie;
-	private BufferedReader entree;
-	private Socket socket;
-	private String clientName;
+public class ChatServeur implements Runnable {
 
-	public ChatServeur() {
-		try {
-			ServerSocket serverSocket = new ServerSocket(PORT);
+    static final int PORT = 6666;
+    private int nbClients = 1;
+    static  Vector<Socket> tabClients = new Vector<Socket>();
+    private PrintWriter sortie;
+    private BufferedReader entree;
+    private Socket socket;
+    private String clientName;
 
-			while (true) {
-				System.out.println("Serveur Prêt");
-				socket = serverSocket.accept();
+    public ChatServeur() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(PORT);
+            System.out.println("Serveur PrÃªt");
 
-				sortie = new PrintWriter(socket.getOutputStream());
-				entree = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				this.nbClients = this.addClient(sortie);
+            while (true) {
+                socket = serverSocket.accept();
+                sortie = new PrintWriter(socket.getOutputStream());
+                entree = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-				System.out.println("Liste des clients : " + this.getListClient());
-				
-				new ChatThread(socket, this);
-				
-				String line = "";
-				int i = 0;
-				this.clientName = entree.readLine();
-				System.out.println("Nom du client : "+this.clientName);
-				while ((line = entree.readLine()) != null) {
-					System.out.println("MSG " + ++i + " : " + line);
-				}
+                new ChatThread(socket).start();
+                this.nbClients = this.addClient(socket);
+                
+                System.out.println("Socket Client  : " + socket);
+                System.out.println("Nombre de clients co : " + this.getNbClients());
+                System.out.println("List clients : " + this.getListClient());
 
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				socket.close();
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			System.out.println("Erreur : " + ex);
-		}
-	}
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            System.out.println("Erreur : " + ex);
+        }
+    }
 
+   
 
-	public void sendToAll(String message, String last) {
-		PrintWriter out;
-		for (int i = 0; i < this.tabClients.size(); i++) // parcours de la table
-															// des clients
-															// connectés
-		{
-			out = (PrintWriter) this.tabClients.elementAt(i);
-			if (out != null) {
-				out.print(message);
-				// out.print(message+last);
-				out.flush();
-			}
-		}
+    /**
+     * Ajoute un client au vecteur
+     *
+     * @param out
+     * @return
+     */
+    synchronized int addClient(Socket socketClient) {
+        this.nbClients++; // New Client
+        this.tabClients.addElement(socketClient);
+        int nbClient = this.tabClients.size() - 1;
+        return nbClient;
 
-	}
+    }
 
-	/**
-	 * Ajoute un client au tableau
-	 * 
-	 * @param out
-	 * @return
-	 */
-	public int addClient(PrintWriter out) {
-		this.nbClients++; // New Client
-		this.tabClients.addElement(out);
-		int nbClient = this.tabClients.size() -1;
-		System.out.println("Nombre de clients co : " + nbClient);
-		return nbClient;
+    
 
-	}
+    synchronized public int getNbClients() {
+        return this.nbClients; // retourne le nombre de clients connectÃ©s
+    }
 
-	/**
-	 * Supprime un client du tableau
-	 * 
-	 * @param i
-	 */
-	public void delClient(int i) {
-		this.nbClients--;
-		if (this.tabClients.elementAt(i) != null) {
-			this.tabClients.removeElementAt(i);
-		}
-	}
+    synchronized Vector getListClient() {
+        return this.tabClients;
+    }
 
-	public Vector getListClient() {
-		return this.tabClients;
-	}
+    public static void main(String[] args) {
+        ChatServeur serveur = new ChatServeur();
+    }
 
-	public static void main(String[] args) {
-		ChatServeur serveur = new ChatServeur();
-	}
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+
 
 }
