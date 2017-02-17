@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Server implements ServerInterface {
 
     private ClientInterface client;
-    static ArrayList<String> tabClients = new ArrayList<String>();
+    static ArrayList<String> tabClientsName = new ArrayList<String>();
+    static ArrayList<ClientInterface> tabClientsInterface = new ArrayList<ClientInterface>();
 
     public Server() {
         try {
@@ -30,26 +31,29 @@ public class Server implements ServerInterface {
 
     @Override
     public void register(ClientInterface client) throws RemoteException {
-        this.client = client;
         client.showYourName();
-        tabClients.add(client.getName());
-        System.out.println("Personnes connectées : " + tabClients);
+        tabClientsName.add(client.getName());
+        tabClientsInterface.add(client);
+        System.out.println("Personnes connectées : " + tabClientsName);
+
+        //Pour tous les clients on envoi la liste des connectés 
+        for (ClientInterface clientInterface : tabClientsInterface) {
+            clientInterface.setListCo(tabClientsName);
+        }
+
     }
 
     @Override
     public void getMessage(String from, String message) throws RemoteException {
         System.out.println("Message reçus : " + message + " de : " + from);
-
+        sendToAll(from, message);
     }
 
     @Override
     public void sendToAll(String from, String message) throws RemoteException {
-        System.out.println("Message reçus : " + message + " de : " + from);
-    }
-
-    @Override
-    public void getName(String name) throws RemoteException {
-
+        for (ClientInterface clientInterface : tabClientsInterface) {
+            clientInterface.setMessage(from, message);
+        }
     }
 
     public static void main(String[] args) {

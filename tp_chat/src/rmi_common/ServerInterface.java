@@ -13,6 +13,4 @@ public interface ServerInterface extends Remote {
 
     public void sendToAll(String from, String message) throws RemoteException;
 
-    public void getName(String name) throws RemoteException;
-
 }

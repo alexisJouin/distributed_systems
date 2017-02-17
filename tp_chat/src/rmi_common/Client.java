@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -63,7 +64,6 @@ public final class Client implements ClientInterface {
             stub = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.getRegistry();
             serv = (ServerInterface) Naming.lookup("rmi://localhost:1099/server");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,7 +131,7 @@ public final class Client implements ClientInterface {
         //Saisie du nom
         this.name = JOptionPane.showInputDialog("Saisir votre Pseudo : ");
         nomClient.setText(this.name + ": ");
-        
+
         //Envoie du mail au server
         try {
             this.serv.register(this.stub);
@@ -175,8 +175,20 @@ public final class Client implements ClientInterface {
         return this.name;
     }
 
+    @Override
+    public void setListCo(ArrayList<String> listClient) throws RemoteException {
+        this.model.clear();
+        for (String clientCo : listClient) {
+            this.model.addElement(clientCo);
+        }
+    }
+
+    @Override
+    public void setMessage(String client, String message) throws RemoteException {
+        this.msgs.append("\n[" + client + "] => " + message + " [TO ALL]");
+    }
+
     public static void main(String[] args) {
         Client client = new Client();
     }
-
 }
