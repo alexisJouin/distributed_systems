@@ -9,4 +9,10 @@ public interface ServerInterface extends Remote {
 
     public void register(ClientInterface client) throws RemoteException;
 
+    public void getMessage(String from, String message) throws RemoteException;
+
+    public void sendToAll(String from, String message) throws RemoteException;
+
+    public void getName(String name) throws RemoteException;
+
 }

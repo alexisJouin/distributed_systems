@@ -14,6 +14,9 @@ import javax.swing.JTextField;
 
 import ActionListener.FieldListener;
 import ActionListener.FieldMouseListener;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
 
 public class ChatInterface {
 
@@ -25,13 +28,16 @@ public class ChatInterface {
     private JPanel southPanel;
     private JButton sendButton;
     private JTextArea msgs;
-    private JTextArea listCo;
     private JTextField msgToSend;
     private JLabel nomClient;
     private String msgSend;
+    private JScrollPane scrollMsgs;
+    private JScrollPane scrollListCo;
+    private DefaultListModel<String> model = new DefaultListModel<>();
+    private JList<String> listCo;
 
     /**
-     * Constructeur par d�faut - Intteraction CLIENT / SERVEUR
+     * Constructeur par défaut - Intteraction CLIENT / SERVEUR
      */
     public ChatInterface(ChatClient c) {
         this.client = c;
@@ -52,7 +58,7 @@ public class ChatInterface {
 
         // Elements des panels
         msgs = new JTextArea("Liste des messages :");
-        listCo = new JTextArea("Liste des personnes connectés :");
+        listCo = new JList<>(model);
         msgToSend = new JTextField("Entrez votre message ! ");
         sendButton = new JButton("Envoyer");
         nomClient = new JLabel("Toto");
@@ -71,7 +77,6 @@ public class ChatInterface {
         listCo.setFont(font);
         listCo.setBackground(Color.darkGray);
         listCo.setForeground(Color.WHITE);
-        listCo.setEditable(false);
 
         sendButton.setFont(font);
 
@@ -91,10 +96,27 @@ public class ChatInterface {
             });
         }
 
-        // Assemblage des �l�ments
+//        InputMap im = sendButton.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+//        ActionMap am = sendButton.getActionMap();
+//
+//        im.put(KeyStroke.getKeyStroke(msgSend).getKeyStroke(KeyEvent.VK_ENTER, 0), "spaced");
+//        am.put("enter", new AbstractAction() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                setMsgToSend(msgToSend.getText());
+//                msgToSend.setText("");
+//            }
+//        });
+        frame.getRootPane().setDefaultButton(sendButton);
+
+        //ScrollBar
+        scrollMsgs = new JScrollPane(msgs);
+        scrollListCo = new JScrollPane(listCo);
+
+        // Assemblage des éléments
         // Nord
-        northPanel.add(msgs, BorderLayout.CENTER);
-        northPanel.add(listCo, BorderLayout.EAST);
+        northPanel.add(scrollMsgs, BorderLayout.CENTER);
+        northPanel.add(scrollListCo, BorderLayout.EAST);
         // Sud
         southPanel.add(nomClient, BorderLayout.WEST);
         southPanel.add(msgToSend, BorderLayout.CENTER);
@@ -118,16 +140,25 @@ public class ChatInterface {
     public String getMsgToSend() {
         return this.msgSend;
     }
-    public JTextArea getMsgs(){
+
+    public JTextArea getMsgs() {
         return this.msgs;
     }
-    
-    public JTextArea getListCo(){
+
+    public JList getListCo() {
         return this.listCo;
     }
-    public JLabel getNomClient(){
+
+    public DefaultListModel getModel() {
+        return this.model;
+    }
+    
+    public void setModel(DefaultListModel m){
+        this.model = m ;
+    }
+
+    public JLabel getNomClient() {
         return this.nomClient;
     }
-        
 
 }

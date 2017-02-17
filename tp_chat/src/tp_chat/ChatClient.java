@@ -10,11 +10,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.text.SimpleAttributeSet;
+
 
 public class ChatClient {
 
@@ -24,7 +25,10 @@ public class ChatClient {
     private String name;
     private ChatInterface chat;
     private JLabel nomClient;
-    private JTextArea listCo;
+    
+    private DefaultListModel<String> model;
+    private JList<String> listCo;
+    private ArrayList<String> tabClients;
 
     public ChatClient() {
 
@@ -68,11 +72,13 @@ public class ChatClient {
                     //Si c'est pour un nouveu client
                 } else if (message.contains("listCo:")) {
                     List<String> arrayClientsCo = new ArrayList<String>(Arrays.asList(message.split(",")));
-
-                    listCo = chat.getListCo();
-                    listCo.setText("Liste des personnes connectés :");
+                    
+                    this.listCo = chat.getListCo();
+                    this.model = chat.getModel();
                     for (String clientsCo : arrayClientsCo) {
-                        listCo.append("\n" + clientsCo.replace("listCo:[", "").replace("]", ""));
+                        //listCo.append("\n" + clientsCo.replace("listCo:[", "").replace("]", ""));
+                        model.addElement(clientsCo.replace("listCo:[", "").replace("]", ""));
+                        chat.setModel(model);
                         System.out.println("list co : " + clientsCo);
                     }
 

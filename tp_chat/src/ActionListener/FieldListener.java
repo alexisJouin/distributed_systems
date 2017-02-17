@@ -7,17 +7,16 @@ import javax.swing.JTextField;
 
 public class FieldListener implements ActionListener {
 
-	private JTextField msg;
+    private JTextField msg;
 
-	public FieldListener(JTextField msg) {
-		this.msg = msg;
-	}
+    public FieldListener(JTextField msg) {
+        this.msg = msg;
+    }
 
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		System.out.println(this.msg.getText());
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // TODO Auto-generated method stub
+        System.out.println(this.msg.getText());
+    }
 
 }

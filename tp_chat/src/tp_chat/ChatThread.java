@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class ChatThread extends Thread implements Runnable {
 
@@ -14,9 +13,11 @@ public class ChatThread extends Thread implements Runnable {
     private PrintWriter sortie;
     private BufferedReader entree;
     private int numClient = 0;
+    private Client client;
+    private ArrayList<Client> clients;
     private String clientName;
     private ArrayList tabInfoMsg = new ArrayList();
-    static ArrayList<String> tabNomClients = new ArrayList<String>();
+    private ArrayList<String> tabNomClients = new ArrayList<String>();
 
     public ChatThread(Socket s) {
 
@@ -33,57 +34,68 @@ public class ChatThread extends Thread implements Runnable {
 
     }
 
-    //ENVOIE A TOUT LE MONDE
-    public void sendToAll(String message, String clientName) throws IOException {
-        for (Socket s : ChatServeur.tabClients) {
-            PrintWriter out = new PrintWriter(s.getOutputStream());
-            tabInfoMsg.add(message);
-            tabInfoMsg.add(this.clientName);
-            out.println("msg:" + tabInfoMsg);
-            out.flush();
-            tabInfoMsg.clear();
-        }
-    }
-
-    public void sendToAll(ArrayList clientCoName) throws IOException {
-        for (Socket s : ChatServeur.tabClients) {
-            PrintWriter out = new PrintWriter(s.getOutputStream());
-            out.println("listCo:" + clientCoName);
-            out.flush();
-        }
-    }
-
     public void run() {
-        String message = "";
-        this.numClient = ChatServeur.tabClients.size();
-        System.out.println("Un nouveau client s'est connecte, n° " + this.numClient++);
         try {
 
             String line = "";
             int i = 0;
-            this.clientName = entree.readLine();
-            System.out.println("Nom du client : " + this.clientName);
-            tabNomClients.add(this.clientName);
 
-            sendToAll(tabNomClients);//Envoi la liste des clients connectés
+            addClient(socket, entree.readLine());//"Création du client"
+            sendToAll(clients);//Envoi la liste des clients connectés
 
             //Envoi des messages
             while ((line = entree.readLine()) != null) {
-                this.sendToAll(line, clientName);
-                System.out.println("MSG de " + this.clientName + " n° " + ++i + " : " + line);
+                this.sendToAll(line, client.getName());
+                System.out.println("MSG de " + client.getName() + " n° " + ++i + " : " + line);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally { //Déconnection du client ??
             try {
-                System.out.println("Le client n° " + this.numClient + " s'est deconnecte");
-                ChatServeur.tabClients.remove(this.socket);
-                this.tabInfoMsg.remove(this.socket);
+                System.out.println("Le client n° " + this.client.getNumero() + " s'est deconnecte");
+                this.clients.remove(this.numClient);
                 this.socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    //Gestion du client
+    public void addClient(Socket socketClient, String nameClient) {
+        client = new Client();
+        client.setSocket(socketClient);
+        client.setName(nameClient);
+        client.setNumero(this.clients.size() + 1);
+
+        System.out.println("-- -- -- -- --");
+        System.out.println("Un nouveau client s'est connecte, n° " + client.getNumero() + " n°Socket : " + client.getSocket());
+        System.out.println("Nom du client : " + client.getName());
+        System.out.println("-- -- -- -- --");
+
+        clients.add(client);
+
+    }
+
+    //ENVOIE A TOUT LE MONDE
+    public void sendToAll(String message, String clientName) throws IOException {
+        for (Client c : clients) {
+            PrintWriter out = new PrintWriter(c.getSocket().getOutputStream());
+            tabInfoMsg.add(message);
+            tabInfoMsg.add(c.getName());
+            out.println("msg:" + tabInfoMsg);
+            out.flush();
+            tabInfoMsg.clear();
+        }
+    }
+
+    //ENVOIE A TOUT LE MONDE LE NOM DES CLIENTS CO
+    public void sendToAll(ArrayList clientCoName) throws IOException {
+        for (Client c : clients) {
+            PrintWriter out = new PrintWriter(c.getSocket().getOutputStream());
+            out.println("listCo:" + clientCoName);
+            out.flush();
         }
     }
 
