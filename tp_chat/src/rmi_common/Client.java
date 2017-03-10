@@ -1,14 +1,9 @@
 package rmi_common;
 
-import ActionListener.FieldListener;
-import ActionListener.FieldMouseListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -177,6 +172,9 @@ public final class Client implements ClientInterface {
 
     @Override
     public void setListCo(ArrayList<String> listClient) throws RemoteException {
+       // System.out.println("Test convers :" + conversation);
+       //ArrayList<ClientInterface> tabClients = conversation.getTabClientsInterface();
+        //frame.setName("Conversation n°" + conversation.getId() + " : " + tabClients);
         this.model.clear();
         for (String clientCo : listClient) {
             this.model.addElement(clientCo);
@@ -187,8 +185,20 @@ public final class Client implements ClientInterface {
     public void setMessage(String client, String message) throws RemoteException {
         this.msgs.append("\n[" + client + "] => " + message + " [TO ALL]");
     }
-
+    
+    @Override
+    public void sendConversation(Conversation conversation) throws RemoteException {
+        msgs.removeAll();
+        
+        //On remets tous les messages stockés de la conversation
+        for(String msg : conversation.getTabMessages()){
+            msgs.append(msg);
+        }
+    }
+    
     public static void main(String[] args) {
         Client client = new Client();
     }
+
+   
 }

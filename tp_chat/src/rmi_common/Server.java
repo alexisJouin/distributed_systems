@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Server implements ServerInterface {
 
     private ClientInterface client;
+    private Conversation conversation;
     static ArrayList<String> tabClientsName = new ArrayList<String>();
     static ArrayList<ClientInterface> tabClientsInterface = new ArrayList<ClientInterface>();
 
@@ -18,6 +19,10 @@ public class Server implements ServerInterface {
             ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind(name, stub);
+            
+            //Nouvelle Conversation créé
+            conversation = new Conversation();
+            
             System.out.println("Server bound");
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,7 +43,9 @@ public class Server implements ServerInterface {
 
         //Pour tous les clients on envoi la liste des connectés 
         for (ClientInterface clientInterface : tabClientsInterface) {
+            conversation.addClient(clientInterface);
             clientInterface.setListCo(tabClientsName);
+            clientInterface.sendConversation(conversation);
         }
 
     }
