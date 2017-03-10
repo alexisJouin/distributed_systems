@@ -8,8 +8,7 @@ module chat{
         void sendMessage(in ChatClient client, in string msg);
         void setMessage (in string nom, in string msg);
         void setListCo(in Clients clients);
-        long getId();
-        string getName();
+        void deconnecte();
           
     };
 
@@ -17,7 +16,7 @@ module chat{
         typedef sequence<ChatClient> clients;
         void register(in ChatClient c);
         void sendToAll(in ChatClient from, in string msg);
-
+        void supprimerClient(in ChatClient client);
     };
 
 };
