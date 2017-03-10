@@ -4,16 +4,17 @@ import chat.ChatClient;
 import chat.ChatServerPOA;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Vector;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
-public class ChatServerImpl extends ChatServerPOA{
+public class ChatServerImpl extends ChatServerPOA {
 
     ORB orb;
     ChatClient client;
     int idClient = 1;
-    
+
     static ArrayList<ChatClient> clients = new ArrayList<ChatClient>();
 
     public ChatServerImpl(String[] args) {
@@ -45,14 +46,15 @@ public class ChatServerImpl extends ChatServerPOA{
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public void register(ChatClient c) {
-        this.client = c;  
+        this.client = c;
         c.id(idClient);
         System.out.println("Enregistrement de " + client.nom() + " n° " + client.id());
         this.clients.add(c);
         this.idClient++;
+        this.setListConnect();
     }
 
     @Override
@@ -61,14 +63,27 @@ public class ChatServerImpl extends ChatServerPOA{
             client.setMessage(from.nom(), msg);
         }
     }
-    
+
     public static void main(String[] args) {
         new ChatServerImpl(args);
     }
 
     @Override
     public void supprimerClient(ChatClient client) {
-        
+        this.clients.remove(client);
+        System.out.println("Client n° " + client.id() + ", " + client.nom() + " déconnecté !");       
+        this.setListConnect();
     }
     
+    
+    public void setListConnect(){
+        //Conversion ArrayList en Array Simple
+        ChatClient[] tabClient = new ChatClient[clients.size()];
+        tabClient = clients.toArray(tabClient);
+        //Pour tous les clients on envoi la liste des connectés 
+        for (ChatClient client : clients) {
+            client.setListCo(tabClient);
+        }
+    }
+
 }

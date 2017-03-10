@@ -116,12 +116,6 @@ public class ChatClientImpl extends ChatClientPOA {
         this.nom(JOptionPane.showInputDialog("Saisir votre Pseudo : "));
         nomClient.setText(this.nom + ": ");
 
-        //Envoie du mail au server
-//        try {
-//            this.serv.register(this.stub);
-//        } catch (RemoteException ex) {
-//            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//        }
         /**
          * ** ActionListener ***
          */
@@ -130,15 +124,31 @@ public class ChatClientImpl extends ChatClientPOA {
             //Quand on tape ENTRER
             msgToSend.addActionListener((ActionEvent e) -> {
                 System.out.println("Key Enter : " + msgToSend.getText());
-//                sendMessage(name, msgToSend.getText());
+                sendMessage(cref, msgToSend.getText());
             });
 
             //Quand on click sur le bouton
             sendButton.addActionListener((ActionEvent e) -> {
                 System.out.println("Button Send : " + msgToSend.getText());
-//                sendMessage(name, msgToSend.getText());
+                sendMessage(cref, msgToSend.getText());
             });
         }
+        //Quand on ferme l'interface on déconnecte !
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(frame,
+                        "Etes vous sur de vouloir vous déconnecter ?", "Quitter le SUPER CHAT 2000 ?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    deconnecte();
+                    System.exit(0);
+                } else {
+                    deconnecte();
+                    System.exit(0);
+                }
+            }
+        });
 
     }
 
@@ -160,14 +170,17 @@ public class ChatClientImpl extends ChatClientPOA {
             BufferedReader br = new BufferedReader(new FileReader("server_ior.txt"));
             String ior = br.readLine();
             br.close();
-            
+
             //Récupération de la référence sur le serveur (à partir de son IOR)
             org.omg.CORBA.Object o = orb.string_to_object(ior);
             server = ChatServerHelper.narrow(o);
-            
+
+            System.out.println("Client Start !");
             this.buildUI();
-            
-            server.register(cref);   
+
+            System.out.println("Client : " + this.cref.nom() + " connecté");
+
+            server.register(cref);
 
         } catch (InvalidName ex) {
             Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -209,22 +222,26 @@ public class ChatClientImpl extends ChatClientPOA {
 
     @Override
     public void sendMessage(ChatClient client, String msg) {
-
+        this.server.sendToAll(client, msg);
     }
 
     @Override
     public void setMessage(String nom, String msg) {
-
+        this.msgToSend.setText("");
+        this.msgs.append("\n[" + nom + "] => " + msg + " [TO ALL]");
     }
 
     @Override
     public void setListCo(ChatClient[] clients) {
-
+        this.model.clear();
+        for (ChatClient clientCo : clients) {
+            this.model.addElement(clientCo.nom());
+        }
     }
 
     @Override
     public void deconnecte() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.server.supprimerClient(this.cref);
     }
 
 }
