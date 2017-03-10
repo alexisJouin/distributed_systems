@@ -1,0 +1,23 @@
+module chat{
+
+    interface ChatClient{
+        attribute long id;
+        attribute string nom;
+        typedef sequence<ChatClient> Clients;
+
+        void sendMessage(in ChatClient client, in string msg);
+        void setMessage (in string nom, in string msg);
+        void setListCo(in Clients clients);
+        long getId();
+        string getName();
+          
+    };
+
+    interface ChatServer{
+        typedef sequence<ChatClient> clients;
+        void register(in ChatClient c);
+        void sendToAll(in ChatClient from, in string msg);
+
+    };
+
+};
