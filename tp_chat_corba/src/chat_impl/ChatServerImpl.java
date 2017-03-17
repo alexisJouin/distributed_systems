@@ -4,7 +4,6 @@ import chat.ChatClient;
 import chat.ChatServerPOA;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Vector;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
