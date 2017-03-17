@@ -17,7 +17,7 @@ public class SubServer extends Thread {
     ArenaServer server;
     Socket socket;
     private String client;
-    private int nbPlaces = 5000;
+    private int nbPlaces;
     private Vector<Socket> clients = new Vector<Socket>();
     private HashMap<String, Integer> reservations = new HashMap<String, Integer>();
 
@@ -37,16 +37,29 @@ public class SubServer extends Thread {
                     stream));
             PrintWriter writer = new PrintWriter(socket.getOutputStream());
 
-            this.client = reader.readLine();
-            this.nbPlaces = Integer.parseInt(reader.readLine());
-            this.reservations.put(this.client, this.nbPlaces);
-            
-            System.out.println("Reservation : " + this.reservations);
+            this.nbPlaces = server.getCapacity();
+            this.clients = server.getClients();
+            this.reservations = server.getReservations();
+
+            writer.println(this.nbPlaces);
+
+            String line = "";
+            String client = "";
+            int nbPlaces;
 
             //server.addReservation(this.client, this.nbPlaces);
-            while ((this.client = reader.readLine()) != null) {
-                writer.println(this.client);
-                writer.println(nbPlaces);
+            while ((client = reader.readLine()) != null) {
+
+                nbPlaces = Integer.parseInt(reader.readLine());
+
+                this.reservations.put(client, nbPlaces);
+                this.nbPlaces = this.nbPlaces - nbPlaces;
+
+                System.out.println("Client : " + client);
+                System.out.println("NB PLACES  : " + nbPlaces);
+                
+                writer.println(Integer.toString(this.nbPlaces));
+                
                 writer.flush();
             }
 

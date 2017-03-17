@@ -40,6 +40,8 @@ public class ArenaStore {
             writer = new PrintWriter(socket.getOutputStream());
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+            System.out.println("Client Start");
+
             buildUI();
             addListeners();
 
@@ -57,6 +59,7 @@ public class ArenaStore {
             String text;
             while ((text = reader.readLine()) != null) {
                 int nbPlaces = Integer.parseInt(text);
+                System.out.println("nbplace " + nbPlaces);
                 available.setText("" + nbPlaces);
             }
 
