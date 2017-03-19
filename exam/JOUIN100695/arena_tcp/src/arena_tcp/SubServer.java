@@ -1,4 +1,4 @@
-package arena_rmi;
+package arena_tcp;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
